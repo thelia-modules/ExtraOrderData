@@ -26,7 +26,7 @@ use Thelia\Model\MetaDataQuery;
  */
 class ExtraOrderDataHook extends BaseHook
 {
-    public function onOrderTabContent(HookRenderEvent $event)
+    public function onOrderTabContent(HookRenderEvent $event) : void
     {
         $data = MetaDataQuery::getVal(ExtraOrderData::META_KEY, MetaData::ORDER_KEY, $event->getArgument('id'));
 
