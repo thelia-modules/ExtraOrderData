@@ -15,6 +15,7 @@ namespace ExtraOrderData\Action;
 
 use ExtraOrderData\ExtraOrderData;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -31,19 +32,19 @@ class ExtraOrderDataAction implements EventSubscriberInterface
     /** @var Request */
     protected $request;
 
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function orderCreate(OrderEvent $event)
+    public function orderCreate(OrderEvent $event): void
     {
         $order = $event->getPlacedOrder();
 
         if (null !== $order) {
             $data = [
-                'REMOTE_ADDR' => $this->request->server->get("REMOTE_ADDR"),
-                'HTTP_USER_AGENT' => $this->request->server->get("HTTP_USER_AGENT"),
+                'REMOTE_ADDR' => $this->request->getClientIp(),
+                'HTTP_USER_AGENT' => $this->request->headers->get('User-Agent'),
             ];
 
             MetaDataQuery::setVal(
@@ -76,7 +77,7 @@ class ExtraOrderDataAction implements EventSubscriberInterface
      *
      * @api
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents() : array
     {
         return [
             TheliaEvents::ORDER_PAY => ['orderCreate', 128]

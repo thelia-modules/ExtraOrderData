@@ -12,11 +12,12 @@
 
 namespace ExtraOrderData;
 
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 
 class ExtraOrderData extends BaseModule
 {
-    const META_KEY = 'extraorderdata';
+    public const META_KEY = 'extraorderdata';
 
     /*
      * You may now override BaseModuleInterface methods, such as:
@@ -24,4 +25,11 @@ class ExtraOrderData extends BaseModule
      *
      * Have fun !
      */
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
+            ->autowire(true)
+            ->autoconfigure(true);
+    }
 }
